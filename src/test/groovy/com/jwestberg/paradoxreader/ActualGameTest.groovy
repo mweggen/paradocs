@@ -14,15 +14,24 @@ class ActualGameTest {
 
     @BeforeClass
     static void setUp() {
-        gameUnderTest = new Game(GameParser.parse(Resources.toString(Resources.getResource("autosave.eu4"), Charset.defaultCharset())))
-
-        println gameUnderTest.getStorage().keySet()
+        gameUnderTest = GameParser.getGame(Resources.toString(Resources.getResource("autosave.eu4"), Charset.forName('UTF-8')))
     }
 
     @Test
     public void canGetTag() {
-
         assertEquals('CRE', gameUnderTest.player)
         assertEquals(new DateTime('1450-1-1'), gameUnderTest.date)
+    }
+
+    @Test
+    public void canGetProvinces() {
+        Provinces.Province stockholm = gameUnderTest.getProvinces().find { it.getId() == 1 }
+
+        assertEquals("Stockholm", stockholm.name)
+        assertEquals("Stockholm", stockholm.capital)
+        assertEquals("SWE", stockholm.getController().tag)
+        assertEquals("grain", stockholm.tradeGoods)
+        assertFalse(stockholm.isInHRE())
+        assertTrue(stockholm.isCity())
     }
 }

@@ -12,9 +12,11 @@ public abstract class GameObject {
         storage = map
     }
 
-    public def getProperty(String name) { storage[name] }
+    public def propertyMissing(String name) { storage[name] }
     public void setProperty(String name, value) { storage[name] = value }
 
     def getStorage() { storage }
     void setStorage(Map<String, Object> map) { storage = map }
+
+    String toString() { storage.toString() }
 }
