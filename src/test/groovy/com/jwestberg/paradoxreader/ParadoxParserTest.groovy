@@ -77,4 +77,15 @@ class ParadoxParserTest {
         assertTrue(map.get('x'))
         assertFalse(map.get('y'))
     }
+
+
+    @Test
+    public void doesNotOverwriteOnDuplicate() {
+        def map = parse(IOUtils.toInputStream('trade={node={name="x"} node={name="y"}}'))
+
+        def nodes = map['trade']['node']
+        assertEquals(2, nodes.size())
+        assertEquals('x', nodes[0].name)
+        assertEquals('y', nodes[1].name)
+    }
 }

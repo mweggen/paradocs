@@ -2,24 +2,44 @@ package com.jwestberg.paradoxreader
 
 import com.google.common.collect.Lists
 import com.google.common.collect.Maps
+import com.jwestberg.paradoxreader.ParadoxParser.RootContext
 import org.antlr.v4.runtime.ANTLRInputStream
 import org.antlr.v4.runtime.CommonTokenStream
 import org.apache.commons.io.IOUtils
 import org.joda.time.DateTime
 
 public class GameParser {
+    public static Game getGame(String input) {
+        getGame(IOUtils.toInputStream(input))
+    }
+
+    public static Game getGame(InputStream input) {
+        getGame(getRoot(input))
+    }
+
+    public static Game getGame(RootContext root) {
+        if(root.key().getText().startsWith("EU4")) {
+            new EU4(walk(root.game()))
+        } else {
+            new Game(walk(root.game()))
+        }
+    }
+
     public static Map<String, Object> parse(String input) {
         parse(IOUtils.toInputStream(input))
     }
 
     public static Map<String, Object> parse(InputStream input) {
-        walk(new ParadoxParser(
+        walk(getRoot(input).game())
+    }
+
+    static def getRoot(InputStream input) {
+        new ParadoxParser(
                 new CommonTokenStream(
                         new ParadoxLexer(new ANTLRInputStream(input)
                         )
                 )
-        ).root().game())
-
+        ).root()
     }
 
     private static Map<String, Object> walk(ParadoxParser.GameContext game) {
@@ -35,7 +55,18 @@ public class GameParser {
         if (pairContext.value() == null) {
             println pairContext.getText()
         }
-        map.put(getKey(pairContext.key()), getValue(pairContext.value()))
+        addToMap(map, getKey(pairContext.key()), getValue(pairContext.value()))
+    }
+
+    static def addToMap(Map map, String key, def p) {
+        if(map.containsKey(key)) {
+            if(!(map.get(key) instanceof List)) {
+                map.put(key, [map.get(key)])
+            }
+            map.get(key).add(p)
+        } else {
+            map.put(key, p)
+        }
     }
 
     static def getKey(ParadoxParser.KeyContext keyContext) {
