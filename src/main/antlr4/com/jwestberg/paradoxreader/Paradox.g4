@@ -68,7 +68,9 @@ STRING: '"' (.)*? '"' ;
 
 DASHES: '-'+ ;
 
-ID : [a-zA-Z0-9_]+ ;
+ID : [\p{L}0-9_]+ ;
+
+COMMENT : '#' ~[\r\n]* '\r'? '\n' -> skip ;
 
 WS : [ \r\t\n]+ -> skip ;
 
